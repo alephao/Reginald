@@ -1,22 +1,76 @@
+const github = require('@actions/github');
 const core = require('@actions/core');
-const wait = require('./wait');
 
+const commentFormatter = require('./commentFormatter');
+const makeCommenter = require('./makeCommenter');
+const makeRunner = require('./makeRunner');
 
-// most @actions toolkit packages have async methods
 async function run() {
-  try { 
-    const ms = core.getInput('milliseconds');
-    console.log(`Waiting ${ms} milliseconds ...`)
+  // Get GitHub token
+  const token = core.getInput('repo-token', { required: true });
 
-    core.debug((new Date()).toTimeString())
-    await wait(parseInt(ms));
-    core.debug((new Date()).toTimeString())
+  // Get contents of mf file
+  const jsFilePath = core.getInput('file-path', { required: true });
 
-    core.setOutput('time', new Date().toTimeString());
-  } 
-  catch (error) {
-    core.setFailed(error.message);
+  // Get prNumber
+  const prNumber = getPrNumber();
+  if (!prNumber) {
+    console.log('Could not get pull request number from context, exiting');
+    return;
   }
+
+  // Create GitHub client
+  const octokit = new github.GitHub(token);
+
+  // Get contents of the mf file
+  const jsFile = await fetchContent(octokit, jsFilePath);
+
+  // Get pull request data
+  // const { data: pullRequest } = await octokit.pulls.get({
+  //     owner: github.context.repo.owner,
+  //     repo: github.context.repo.repo,
+  //     pull_number: prNumber,
+  // });
+
+  const commentClinet = {
+    makeComment: async (comment) => {
+      // POST /repos/:owner/:repo/issues/:issue_number/comments
+      await octokit.request('POST /repos/:owner/:repo/issues/:issue_number/comments', {
+        body: comment,
+        owner: github.context.repo.owner,
+        repo: github.context.repo.repo,
+        issue_number: github.context.issue_number,
+      });
+    }
+  };
+
+  const commenter = makeCommenter(commentClinet, commentFormatter);
+  const runner = makeRunner(commenter, jsFile);
+
+  await runner.run();    
 }
 
-run()
+function getPrNumber() {
+  const pullRequest = github.context.payload.pull_request;
+  if (!pullRequest) {
+    return undefined;
+  }
+
+  return pullRequest.number;
+}
+
+async function fetchContent(
+  client,
+  path
+) {
+  const response = await client.repos.getContents({
+    owner: github.context.repo.owner,
+    repo: github.context.repo.repo,
+    path: path,
+    ref: github.context.sha
+  });
+
+  return Buffer.from(response.data.content, response.data.encoding).toString();
+}
+
+run();
