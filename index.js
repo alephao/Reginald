@@ -37,7 +37,7 @@ async function run() {
       await octokit.issues.createComment({
         owner: github.context.repo.owner,
         repo: github.context.repo.repo,        
-        issue_number: github.context.issue_number,
+        issue_number: prNumber,
         body: comment
       });
     }
