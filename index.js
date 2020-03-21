@@ -34,12 +34,11 @@ async function run() {
 
   const commentClinet = {
     makeComment: async (comment) => {
-      // POST /repos/:owner/:repo/issues/:issue_number/comments
-      await octokit.request('POST /repos/:owner/:repo/issues/:issue_number/comments', {
-        body: comment,
+      await octokit.issues.createComment({
         owner: github.context.repo.owner,
-        repo: github.context.repo.repo,
+        repo: github.context.repo.repo,        
         issue_number: github.context.issue_number,
+        body: comment
       });
     }
   };
