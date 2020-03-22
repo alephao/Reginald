@@ -1,6 +1,8 @@
 const makeRunner = require('./makeRunner');
 const makeCommenter = require('./makeCommenter');
-const commentFormatter = require('./commentFormatter');
+const makeCommentFormatter = require('./makeCommentFormatter');
+
+const commentFormatter = makeCommentFormatter("reginald");
 
 test('Test runner sending messages', async () => {
   // Make commenter

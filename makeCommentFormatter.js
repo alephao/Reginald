@@ -47,8 +47,17 @@ const formatComment = (messages, warnings, errors) => {
   return formattedComments.join("\n\n");
 }
 
-const commentFormatter = {
-  format: formatComment
+const formatterWithReginaldId = (id) => {
+  return (messages, warnings, errors) => {
+    const formattedComment = formatComment(messages, warnings, errors);
+    return `<!--reginald-id: ${id}-->\n${formattedComment}`;
+  }
 }
 
-module.exports = commentFormatter;
+const makeCommentFormatter = (id) => {
+  return {
+    format: formatterWithReginaldId(id)
+  }
+}
+
+module.exports = makeCommentFormatter;

@@ -1,5 +1,7 @@
 const makeCommenter = require('./makeCommenter');
-const commentFormatter = require('./commentFormatter');
+const makeCommentFormatter = require('./makeCommentFormatter');
+
+const commentFormatter = makeCommentFormatter("reginald");
 
 test('Runs makeComment with messages, warnings and errors', () => {
   var commentSent = undefined;

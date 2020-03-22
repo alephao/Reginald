@@ -8,6 +8,10 @@ inputs:
     description: 'Path to a Reginaldfile file'
     required: true
     default: '.github/Reginaldfile.js'
+  reginald-id:
+    description: 'An id to differentiate multiple Reginalds'
+    required: true
+    default: 'reginald'
 runs:
   using: 'node12'
   main: 'dist/index.js'

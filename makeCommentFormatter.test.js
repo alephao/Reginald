@@ -1,4 +1,6 @@
-const commentFormatter = require('./commentFormatter');
+const makeCommentFormatter = require('./makeCommentFormatter');
+
+const commentFormatter = makeCommentFormatter("reginald");
 
 test('Test formatted message with messages, warning and errors', () => {
   const messages = ["Message 1", "Message 2"];
@@ -7,7 +9,8 @@ test('Test formatted message with messages, warning and errors', () => {
 
   const formattedComments = commentFormatter.format(messages, warnings, errors);
 
-  expect(formattedComments).toEqual(`**Messages**
+  expect(formattedComments).toEqual(`<!--reginald-id: reginald-->
+**Messages**
 :speech_balloon: Message 1
 :speech_balloon: Message 2
 
@@ -25,7 +28,8 @@ test('Test formatted message with only messages', () => {
 
   const formattedComments = commentFormatter.format(messages, [], []);
 
-  expect(formattedComments).toEqual(`**Messages**
+  expect(formattedComments).toEqual(`<!--reginald-id: reginald-->
+**Messages**
 :speech_balloon: Message 1
 :speech_balloon: Message 2`);
 });

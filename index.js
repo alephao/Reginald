@@ -1,7 +1,7 @@
 const github = require('@actions/github');
 const core = require('@actions/core');
 
-const commentFormatter = require('./commentFormatter');
+const makeCommentFormatter = require('./makeCommentFormatter');
 const makeCommenter = require('./makeCommenter');
 const makeRunner = require('./makeRunner');
 
@@ -11,6 +11,9 @@ async function run() {
 
   // Get contents of mf file
   const jsFilePath = core.getInput('file-path', { required: true });
+
+  // Get Reginald ID
+  const reginaldId = core.getInput('reginald-id', { required: true });
 
   // Get prNumber
   const prNumber = getPrNumber();
@@ -43,6 +46,7 @@ async function run() {
     }
   };
 
+  const commentFormatter = makeCommentFormatter(reginaldId);
   const commenter = makeCommenter(commentClinet, commentFormatter);
   const runner = makeRunner(commenter, jsFile);
 
