@@ -1,14 +1,14 @@
 
 const formatMessage = (body) => {
-  return `💬 ${body}`;
+  return `:speech_balloon: ${body}`;
 }
 
 const formatWarning = (body) => {
-  return `⚠️ ${body}`;
+  return `:warning: ${body}`;
 }
 
 const formatError = (body) => {
-  return `🚫 ${body}`;
+  return `:no_entry_sign: ${body}`;
 }
 
 const formatComment = (messages, warnings, errors) => {
