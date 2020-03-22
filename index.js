@@ -25,7 +25,7 @@ async function run() {
   // Create GitHub client
   const octokit = new github.GitHub(token);
 
-  // Get contents of the mf file
+  // Get contents of the Reginald file
   const jsFile = await fetchContent(octokit, jsFilePath);
 
   // Get pull request data
@@ -46,7 +46,7 @@ async function run() {
     }
   };
 
-  const commentFormatter = makeCommentFormatter(reginaldId);
+  const commentFormatter = makeCommentFormatter(reginaldId); 
   const commenter = makeCommenter(commentClinet, commentFormatter);
   const runner = makeRunner(commenter, jsFile);
 
