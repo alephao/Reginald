@@ -35,19 +35,75 @@ async function run() {
   //     pull_number: prNumber,
   // });
 
-  const commentClinet = {
-    makeComment: async (comment) => {
+  const owner = github.context.repo.owner;
+  const repo = github.context.repo.repo;
+
+  const commentActions = {
+    findPreviousComment: async (id) => {
+      return await core.group(`Finding previous comment with id ${id}`, async () => {
+        core.debug(`Getting comments for /${owner}/${repo}/pull/${prNumber}`);
+        const { data: comments } = await octokit.issues.listComments({
+          owner,
+          repo,
+          issue_number: prNumber,
+        });
+
+        core.debug(`Got ${comments.count} comments`);
+        core.debug(JSON.stringify(comments));
+
+        const comment = comments.find((commentObject) => {
+          return commentObject["body"].startsWith(`<!--reginald-id: ${id}-->`);
+        })
+
+        if (comment) {
+          core.debug(`Found comment with id ${id}`)
+          core.debug(JSON.stringify(comment))
+        } else {
+          core.debug(`Couldn't find comment with id ${id}`)
+        }
+
+        return comment
+      });
+    },
+    editComment: async (comment_id, body) => {
+      await octokit.issues.updateComment({
+        owner,
+        repo,
+        comment_id,
+        body,
+      });
+    },
+    createComment: async (body) => {
       await octokit.issues.createComment({
-        owner: github.context.repo.owner,
-        repo: github.context.repo.repo,        
+        owner,
+        repo,
         issue_number: prNumber,
-        body: comment
+        body
       });
     }
   };
 
+  const makeCommentClient = (id) => {
+    return {
+      makeComment: async (body) => {
+        core.debug(`Checking if there is a comment with id: ${id}`);
+        const previousComment = await commentActions.findPreviousComment(id);
+        core.debug(`Found:`);
+        core.debug(JSON.stringify(previousComment));
+        if (previousComment && previousComment["id"]) {
+          core.debug("Editing comment...");
+          await commentActions.editComment(previousComment["id"], body);
+        } else {
+          core.debug("Creating comment...");
+          await commentActions.createComment(body);
+        }
+      }
+    }
+  }
+
   const commentFormatter = makeCommentFormatter(reginaldId); 
-  const commenter = makeCommenter(commentClinet, commentFormatter);
+  const commentClient = makeCommentClient(reginaldId);
+  const commenter = makeCommenter(commentClient, commentFormatter);
   const runner = makeRunner(commenter, jsFile);
 
   await runner.run();    
