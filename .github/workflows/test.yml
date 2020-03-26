@@ -1,4 +1,4 @@
-name: "units-test"
+name: "Run tests"
 on:
   pull_request:
   push:
@@ -8,9 +8,10 @@ on:
 
 jobs:
   # unit tests
-  units:
+  test:
     runs-on: ubuntu-latest
     steps:
     - uses: actions/checkout@v1
-    - run: npm ci
-    - run: npm test
+    - run: |
+        npm install
+        npm run all
