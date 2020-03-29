@@ -1,4 +1,4 @@
-import {FormatStringFunction} from './StringFormatter'
+import {FormatStringFunction} from './FormatStringFunction'
 
 export class CommentSectionFormatter {
   header: string
@@ -22,7 +22,7 @@ export class CommentSectionFormatter {
   }
 }
 
-const prependEmoji = (emoji: string) => {
+const prependEmoji = (emoji: string): ((str: string) => string) => {
   return (str: string) => {
     return [emoji, str].join(' ')
   }

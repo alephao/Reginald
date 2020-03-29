@@ -4,21 +4,15 @@ import {
   errorSectionFormatter
 } from './CommentSectionFormatter'
 
-export const formatCommentId = (id: string) => {
+export const formatCommentId = (id: string): string => {
   return `<!--reginald-id: ${id}-->`
 }
 
-export interface CommentFormatter {
-  (id: string): (
-    messages: string[],
-    warnings: string[],
-    errors: string[]
-  ) => string
-}
-
-export const commentFormatter: CommentFormatter = (id: string) => {
+export const commentFormatter = (
+  id: string
+): ((messages: string[], warnings: string[], errors: string[]) => string) => {
   return (messages: string[], warnings: string[], errors: string[]) => {
-    var formattedComments = []
+    const formattedComments = []
 
     const messageSection = messageSectionFormatter.format(messages)
     if (messageSection.length > 0) {

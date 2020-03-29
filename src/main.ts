@@ -9,7 +9,7 @@ import {makeCommentService, makeCommentActions} from './commentService'
 
 async function run(): Promise<void> {
   try {
-    const getInput: (name: string) => string = name =>
+    const getInput = (name: string): string =>
       core.getInput(name, {required: true})
     const actionInputs = getActionInputs(getInput)
 
@@ -27,7 +27,7 @@ async function run(): Promise<void> {
     }
 
     // Get pull-request number aka issue_number
-    const issue_number = pullRequestPayload.number
+    const issueNumber = pullRequestPayload.number
 
     // Create GitHub client
     const octokit = new github.GitHub(actionInputs.token)
@@ -36,7 +36,7 @@ async function run(): Promise<void> {
     const commentActions = makeCommentActions(
       github.context.repo.owner,
       github.context.repo.repo,
-      issue_number
+      issueNumber
     )(octokit)
     const commentService = makeCommentService(commentActions)
 
@@ -65,7 +65,7 @@ async function fetchContent(
   const response = await octokit.repos.getContents({
     owner: github.context.repo.owner,
     repo: github.context.repo.repo,
-    path: path,
+    path,
     ref: github.context.sha
   })
 

@@ -4,9 +4,9 @@ export interface ActionInupts {
   reginaldId: string
 }
 
-export const getActionInputs: (
+export const getActionInputs = (
   getInput: (name: string) => string
-) => ActionInupts = getInput => {
+): ActionInupts => {
   const token = getInput('repo-token')
   const reginaldfilePath = getInput('file-path')
   const reginaldId = getInput('reginald-id')

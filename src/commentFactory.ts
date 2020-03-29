@@ -7,24 +7,24 @@ export interface CommentFactory {
   makeComment: (id: string) => string
 }
 
-export const makeCommentFactory: () => CommentFactory = () => {
-  var messages: string[] = []
-  var warnings: string[] = []
-  var errors: string[] = []
+export const makeCommentFactory = (): CommentFactory => {
+  const messages: string[] = []
+  const warnings: string[] = []
+  const errors: string[] = []
 
-  const addMessage = (body: string) => {
+  const addMessage = (body: string): void => {
     messages.push(body)
   }
 
-  const addWarning = (body: string) => {
+  const addWarning = (body: string): void => {
     warnings.push(body)
   }
 
-  const addError = (body: string) => {
+  const addError = (body: string): void => {
     errors.push(body)
   }
 
-  const makeComment = (id: string) => {
+  const makeComment = (id: string): string => {
     return commentFormatter(id)(messages, warnings, errors)
   }
 

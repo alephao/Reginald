@@ -9,11 +9,11 @@ export interface ReginaldRunner {
   run: () => Promise<void>
 }
 
-const makeRunner: (
+const makeRunner = (
   dsl: ReginaldDSL,
   reginaldfileContent: string,
   done: () => Promise<void>
-) => ReginaldRunner = (dsl, reginaldfileContent, done) => {
+): ReginaldRunner => {
   const run = new AsyncFunction('reginald', reginaldfileContent)
 
   return {
@@ -24,19 +24,14 @@ const makeRunner: (
   }
 }
 
-export interface ReginaldRunnerFactory {
-  (
-    commentFactory: CommentFactory,
-    commentService: CommentService,
-    pullRequest: Webhooks.WebhookPayloadPullRequestPullRequest
-  ): (reginaldCommentId: string, reginaldfileContent: string) => ReginaldRunner
-}
-
-export const runnerFactory: ReginaldRunnerFactory = (
-  commentFactory,
-  commentService,
-  pullRequest
-) => {
+export const runnerFactory = (
+  commentFactory: CommentFactory,
+  commentService: CommentService,
+  pullRequest: Webhooks.WebhookPayloadPullRequestPullRequest
+): ((
+  reginaldCommentId: string,
+  reginaldfileContent: string
+) => ReginaldRunner) => {
   return (reginaldCommentId, reginaldfileContent) => {
     const dsl: ReginaldDSL = {
       message: commentFactory.addMessage,
@@ -45,7 +40,7 @@ export const runnerFactory: ReginaldRunnerFactory = (
       pr: pullRequest
     }
 
-    const done = async () => {
+    const done = async (): Promise<void> => {
       const commentBody = commentFactory.makeComment(reginaldCommentId)
       await commentService.createOrUpdateComment(reginaldCommentId, commentBody)
     }

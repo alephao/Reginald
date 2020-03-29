@@ -5,23 +5,24 @@ export interface CommentActions {
   findIdOfPreviousCommentWithReginaldId: (
     reginaldCommentId: string
   ) => Promise<number | undefined>
-  editComment: (comment_id: number, body: string) => Promise<void>
+  editComment: (commentId: number, body: string) => Promise<void>
   createComment: (body: string) => Promise<void>
 }
 
-export const makeCommentActions: (
+export const makeCommentActions = (
   owner: string,
   repo: string,
-  issue_number: number
-) => (github: GitHub) => CommentActions = (owner, repo, issue_number) => {
+  issueNumber: number
+): ((github: GitHub) => CommentActions) => {
   return github => {
     const findIdOfPreviousCommentWithReginaldId = async (
       reginaldCommentId: string
-    ) => {
+    ): Promise<number | undefined> => {
       const {data: comments} = await github.issues.listComments({
         owner,
         repo,
-        issue_number
+        // eslint-disable-next-line @typescript-eslint/camelcase
+        issue_number: issueNumber
       })
 
       const comment = comments.find(commentObject => {
@@ -32,19 +33,24 @@ export const makeCommentActions: (
       return comment?.id
     }
 
-    const editComment = async (comment_id: number, body: string) => {
+    const editComment = async (
+      commentId: number,
+      body: string
+    ): Promise<void> => {
       await github.issues.updateComment({
-        comment_id,
+        // eslint-disable-next-line @typescript-eslint/camelcase
+        comment_id: commentId,
         body,
         owner,
         repo
       })
     }
 
-    const createComment = async (body: string) => {
+    const createComment = async (body: string): Promise<void> => {
       await github.issues.createComment({
         body,
-        issue_number,
+        // eslint-disable-next-line @typescript-eslint/camelcase
+        issue_number: issueNumber,
         owner,
         repo
       })
@@ -53,7 +59,7 @@ export const makeCommentActions: (
     const createOrUpdateComment = async (
       reginaldCommentId: string,
       body: string
-    ) => {
+    ): Promise<void> => {
       const previousCommentId = await findIdOfPreviousCommentWithReginaldId(
         reginaldCommentId
       )
@@ -80,13 +86,11 @@ export interface CommentService {
   ) => Promise<void>
 }
 
-export const makeCommentService: (
-  actions: CommentActions
-) => CommentService = actions => {
+export const makeCommentService = (actions: CommentActions): CommentService => {
   const createOrUpdateComment = async (
     reginaldCommentId: string,
     body: string
-  ) => {
+  ): Promise<void> => {
     const previousCommentId = await actions.findIdOfPreviousCommentWithReginaldId(
       reginaldCommentId
     )
