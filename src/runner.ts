@@ -1,18 +1,12 @@
 import {ReginaldDSL} from './ReginaldDSL'
 import {CommentFactory} from './commentFactory'
 import {CommentService} from './commentService'
+import * as Webhooks from '@octokit/webhooks'
 
 const AsyncFunction = Object.getPrototypeOf(async function() {}).constructor
 
 export interface ReginaldRunner {
   run: () => Promise<void>
-}
-
-export interface ReginaldRunnerFactory {
-  (commentFactory: CommentFactory, commentService: CommentService): (
-    reginaldCommentId: string,
-    reginaldfileContent: string
-  ) => ReginaldRunner
 }
 
 const makeRunner: (
@@ -30,15 +24,24 @@ const makeRunner: (
   }
 }
 
+export interface ReginaldRunnerFactory {
+  (commentFactory: CommentFactory, commentService: CommentService, pullRequest: Webhooks.WebhookPayloadPullRequestPullRequest): (
+    reginaldCommentId: string,
+    reginaldfileContent: string
+  ) => ReginaldRunner
+}
+
 export const runnerFactory: ReginaldRunnerFactory = (
   commentFactory,
-  commentService
+  commentService,
+  pullRequest
 ) => {
   return (reginaldCommentId, reginaldfileContent) => {
     const dsl: ReginaldDSL = {
       message: commentFactory.addMessage,
       warning: commentFactory.addWarning,
-      error: commentFactory.addError
+      error: commentFactory.addError,
+      pr: pullRequest
     }
 
     const done = async () => {

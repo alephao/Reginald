@@ -1,5 +1,6 @@
 import * as core from '@actions/core'
 import * as github from '@actions/github'
+import * as Webhooks from '@octokit/webhooks'
 
 import {getActionInputs} from './getActionInputs'
 import {runnerFactory} from './runner'
@@ -11,14 +12,23 @@ async function run(): Promise<void> {
     const getInput: (name: string) => string = (name) => core.getInput(name, {required: true});
     const actionInputs = getActionInputs(getInput);
 
-    // Get pull-request number aka issue_number
-    const issue_number = github.context.payload.pull_request?.number
-    if (!issue_number) {
-      console.log('Could not get pull request number from context, exiting')
+    if (github.context.eventName !== 'pull_request') {
+      // Note: This won't fail the check
+      core.error('Reginald only runs for pull_request events');
       return
     }
 
-    const octokit = new github.GitHub(actionInputs.token) // Create GitHub client
+    const pullRequestPayload = github.context.payload.pull_request as Webhooks.WebhookPayloadPullRequestPullRequest;
+    if (!pullRequestPayload) {
+      core.error('Pull request payload not available from context. Exiting.')
+      return
+    }
+    
+    // Get pull-request number aka issue_number
+    const issue_number = pullRequestPayload.number
+
+    // Create GitHub client
+    const octokit = new github.GitHub(actionInputs.token) 
 
     const commentFactory = makeCommentFactory()
     const commentActions = makeCommentActions(
@@ -31,7 +41,7 @@ async function run(): Promise<void> {
     // Content
     const reginaldfileContent = await fetchContent(octokit, actionInputs.reginaldfilePath)
 
-    const runner = runnerFactory(commentFactory, commentService)(
+    const runner = runnerFactory(commentFactory, commentService, pullRequestPayload)(
       actionInputs.reginaldId,
       reginaldfileContent
     )
