@@ -1,15 +1,15 @@
 import * as core from '@actions/core'
 import * as github from '@actions/github'
 
+import {getActionInputs} from './getActionInputs'
 import {runnerFactory} from './runner'
 import {makeCommentFactory} from './commentFactory'
 import {makeCommentService, makeCommentActions} from './commentService'
 
 async function run(): Promise<void> {
   try {
-    const token = core.getInput('repo-token', {required: true}) // Get GitHub token from configs
-    const reginaldfilePath = core.getInput('file-path', {required: true}) // Get contents of Reginaldfile from configs
-    const reginaldId = core.getInput('reginald-id', {required: true}) // Get Reginald ID from configs
+    const getInput: (name: string) => string = (name) => core.getInput(name, {required: true});
+    const actionInputs = getActionInputs(getInput);
 
     // Get pull-request number aka issue_number
     const issue_number = github.context.payload.pull_request?.number
@@ -18,25 +18,21 @@ async function run(): Promise<void> {
       return
     }
 
-    const octokit = new github.GitHub(token) // Create GitHub client
-
-    // Easier access to some constants
-    const owner = github.context.repo.owner
-    const repo = github.context.repo.repo
+    const octokit = new github.GitHub(actionInputs.token) // Create GitHub client
 
     const commentFactory = makeCommentFactory()
     const commentActions = makeCommentActions(
-      owner,
-      repo,
+      github.context.repo.owner,
+      github.context.repo.repo,
       issue_number
     )(octokit)
     const commentService = makeCommentService(commentActions)
 
     // Content
-    const reginaldfileContent = await fetchContent(octokit, reginaldfilePath)
+    const reginaldfileContent = await fetchContent(octokit, actionInputs.reginaldfilePath)
 
     const runner = runnerFactory(commentFactory, commentService)(
-      reginaldId,
+      actionInputs.reginaldId,
       reginaldfileContent
     )
 
