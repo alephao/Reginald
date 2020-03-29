@@ -25,10 +25,11 @@ const makeRunner: (
 }
 
 export interface ReginaldRunnerFactory {
-  (commentFactory: CommentFactory, commentService: CommentService, pullRequest: Webhooks.WebhookPayloadPullRequestPullRequest): (
-    reginaldCommentId: string,
-    reginaldfileContent: string
-  ) => ReginaldRunner
+  (
+    commentFactory: CommentFactory,
+    commentService: CommentService,
+    pullRequest: Webhooks.WebhookPayloadPullRequestPullRequest
+  ): (reginaldCommentId: string, reginaldfileContent: string) => ReginaldRunner
 }
 
 export const runnerFactory: ReginaldRunnerFactory = (

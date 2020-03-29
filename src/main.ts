@@ -9,26 +9,28 @@ import {makeCommentService, makeCommentActions} from './commentService'
 
 async function run(): Promise<void> {
   try {
-    const getInput: (name: string) => string = (name) => core.getInput(name, {required: true});
-    const actionInputs = getActionInputs(getInput);
+    const getInput: (name: string) => string = name =>
+      core.getInput(name, {required: true})
+    const actionInputs = getActionInputs(getInput)
 
     if (github.context.eventName !== 'pull_request') {
       // Note: This won't fail the check
-      core.error('Reginald only runs for pull_request events');
+      core.error('Reginald only runs for pull_request events')
       return
     }
 
-    const pullRequestPayload = github.context.payload.pull_request as Webhooks.WebhookPayloadPullRequestPullRequest;
+    const pullRequestPayload = github.context.payload
+      .pull_request as Webhooks.WebhookPayloadPullRequestPullRequest
     if (!pullRequestPayload) {
       core.error('Pull request payload not available from context. Exiting.')
       return
     }
-    
+
     // Get pull-request number aka issue_number
     const issue_number = pullRequestPayload.number
 
     // Create GitHub client
-    const octokit = new github.GitHub(actionInputs.token) 
+    const octokit = new github.GitHub(actionInputs.token)
 
     const commentFactory = makeCommentFactory()
     const commentActions = makeCommentActions(
@@ -39,12 +41,16 @@ async function run(): Promise<void> {
     const commentService = makeCommentService(commentActions)
 
     // Content
-    const reginaldfileContent = await fetchContent(octokit, actionInputs.reginaldfilePath)
-
-    const runner = runnerFactory(commentFactory, commentService, pullRequestPayload)(
-      actionInputs.reginaldId,
-      reginaldfileContent
+    const reginaldfileContent = await fetchContent(
+      octokit,
+      actionInputs.reginaldfilePath
     )
+
+    const runner = runnerFactory(
+      commentFactory,
+      commentService,
+      pullRequestPayload
+    )(actionInputs.reginaldId, reginaldfileContent)
 
     await runner.run()
   } catch (error) {

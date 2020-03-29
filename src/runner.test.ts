@@ -11,11 +11,17 @@ const assertFunc: (
   reginaldId: string,
   reginaldfile: string,
   generatedComment: string
- ) => void = (assertionDescription, prStub, reginaldId, reginaldFile, generatedComment) => {
+) => void = (
+  assertionDescription,
+  prStub,
+  reginaldId,
+  reginaldFile,
+  generatedComment
+) => {
   test(assertionDescription, async () => {
     var calledReginaldId: string | undefined
     var calledBody: string | undefined
-  
+
     const commentFactory = makeCommentFactory()
     const commentService: CommentService = {
       createOrUpdateComment: async (reginaldCommentId, body) => {
@@ -23,33 +29,39 @@ const assertFunc: (
         calledBody = body
       }
     }
-  
+
     // Just to satisfy the dependencies
-    const pr = prStub as Webhooks.WebhookPayloadPullRequestPullRequest;
-  
-    const runner = runnerFactory(commentFactory, commentService, pr)(
-      reginaldId, reginaldFile);
-  
-    await runner.run();
-  
-    expect(calledReginaldId).toEqual(reginaldId);
-    expect(calledBody).toEqual(generatedComment);
-  });
+    const pr = prStub as Webhooks.WebhookPayloadPullRequestPullRequest
+
+    const runner = runnerFactory(
+      commentFactory,
+      commentService,
+      pr
+    )(reginaldId, reginaldFile)
+
+    await runner.run()
+
+    expect(calledReginaldId).toEqual(reginaldId)
+    expect(calledBody).toEqual(generatedComment)
+  })
 }
 
-const assert: (assertionDescription: string, args: {
-  prStub: any // The pull request webhook data stub
-  reginaldId: string
-  reginaldfile: string
-  generatedComment: string
-}) => void = (assertionDescription, args) => {
-  const reginaldfile = args.reginaldfile.trim();
-  const generatedComment = args.generatedComment.trim();
+const assert: (
+  assertionDescription: string,
+  args: {
+    prStub: any // The pull request webhook data stub
+    reginaldId: string
+    reginaldfile: string
+    generatedComment: string
+  }
+) => void = (assertionDescription, args) => {
+  const reginaldfile = args.reginaldfile.trim()
+  const generatedComment = args.generatedComment.trim()
 
   test(assertionDescription, async () => {
     var calledReginaldId: string | undefined
     var calledBody: string | undefined
-  
+
     const commentFactory = makeCommentFactory()
     const commentService: CommentService = {
       createOrUpdateComment: async (reginaldCommentId, body) => {
@@ -57,18 +69,21 @@ const assert: (assertionDescription: string, args: {
         calledBody = body
       }
     }
-  
+
     // Just to satisfy the dependencies
-    const pr = args.prStub as Webhooks.WebhookPayloadPullRequestPullRequest;
-  
-    const runner = runnerFactory(commentFactory, commentService, pr)(
-      args.reginaldId, reginaldfile);
-  
-    await runner.run();
-  
-    expect(calledReginaldId).toEqual(args.reginaldId);
-    expect(calledBody).toEqual(generatedComment);
-  });
+    const pr = args.prStub as Webhooks.WebhookPayloadPullRequestPullRequest
+
+    const runner = runnerFactory(
+      commentFactory,
+      commentService,
+      pr
+    )(args.reginaldId, reginaldfile)
+
+    await runner.run()
+
+    expect(calledReginaldId).toEqual(args.reginaldId)
+    expect(calledBody).toEqual(generatedComment)
+  })
 }
 
 assert('createOrUpdateComment is called with the right arguments', {
@@ -94,10 +109,10 @@ reginald.error('E');
 **Errors**
 :no_entry_sign: E
 `
-});
+})
 
 assert('Send an error when the pull request title is wrong', {
-  prStub: { title: 'Hello' },
+  prStub: {title: 'Hello'},
   reginaldId: '321',
   reginaldfile: `
 if (reginald.pr.title === 'Hello World') {
@@ -111,10 +126,10 @@ if (reginald.pr.title === 'Hello World') {
 **Errors**
 :no_entry_sign: The title is wrong!
 `
-});
+})
 
 assert('Send a message when pull request title is right', {
-  prStub: { title: 'Hello World' },
+  prStub: {title: 'Hello World'},
   reginaldId: 'reginald',
   reginaldfile: `
 if (reginald.pr.title === 'Hello World') {
@@ -128,4 +143,4 @@ if (reginald.pr.title === 'Hello World') {
 **Messages**
 :speech_balloon: The title is correct!
 `
-});
+})
