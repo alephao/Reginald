@@ -11,6 +11,7 @@ const assert: (
     reginaldId: string
     reginaldfile: string
     generatedComment: string
+    prShouldFail: boolean
   }
 ) => void = (assertionDescription, args) => {
   const reginaldfile = args.reginaldfile.trim()
@@ -19,6 +20,8 @@ const assert: (
   test(assertionDescription, async () => {
     var calledReginaldId: string | undefined
     var calledBody: string | undefined
+    
+    var calledSetFailed: boolean = false
 
     const commentBuilder = new CommentBuilder()
     const commentService: CommentService = {
@@ -34,6 +37,7 @@ const assert: (
     const runner = runnerFactory(
       commentBuilder,
       commentService,
+      () => { calledSetFailed = true },
       pr
     )(args.reginaldId, reginaldfile)
 
@@ -41,6 +45,7 @@ const assert: (
 
     expect(calledReginaldId).toEqual(args.reginaldId)
     expect(calledBody).toEqual(generatedComment)
+    expect(calledSetFailed).toEqual(args.prShouldFail)
   })
 }
 
@@ -66,7 +71,8 @@ reginald.error('E');
 
 **Errors**
 :no_entry_sign: E
-`
+`,
+prShouldFail: true
 })
 
 assert('Send an error when the pull request title is wrong', {
@@ -83,7 +89,8 @@ if (reginald.pr.title === 'Hello World') {
 <!--reginald-id: 321-->
 **Errors**
 :no_entry_sign: The title is wrong!
-`
+`,
+prShouldFail: true
 })
 
 assert('Send a message when pull request title is right', {
@@ -100,5 +107,6 @@ if (reginald.pr.title === 'Hello World') {
 <!--reginald-id: reginald-->
 **Messages**
 :speech_balloon: The title is correct!
-`
+`,
+prShouldFail: false
 })

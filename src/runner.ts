@@ -27,6 +27,7 @@ const makeRunner = (
 export const runnerFactory = (
   commentBuilder: CommentBuilder,
   commentService: CommentService,
+  setFailed: () => void, // Function that sets the pr to failed
   pullRequest: Webhooks.WebhookPayloadPullRequestPullRequest
 ): ((
   reginaldCommentId: string,
@@ -46,6 +47,7 @@ export const runnerFactory = (
         reginaldCommentId,
         commentBody
       )
+      if (commentBuilder.errors.length > 0) { setFailed(); }
     }
 
     return makeRunner(dsl, reginaldfileContent, done)

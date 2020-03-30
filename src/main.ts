@@ -49,6 +49,7 @@ async function run(): Promise<void> {
     const runner = runnerFactory(
       commentBuilder,
       commentService,
+      () =>  core.setFailed('Reginald left a comment on the pull request'),
       pullRequestPayload
     )(actionInputs.reginaldId, reginaldfileContent)
 
