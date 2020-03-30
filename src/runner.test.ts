@@ -4,48 +4,6 @@ import {runnerFactory} from './runner'
 import {makeCommentFactory} from './commentFactory'
 import {CommentService} from './commentService'
 
-// Helper function to create runner tests. Do not use this!
-const assertFunc: (
-  assertionDescription: string,
-  prStub: any, // The pull request webhook data stub
-  reginaldId: string,
-  reginaldfile: string,
-  generatedComment: string
-) => void = (
-  assertionDescription,
-  prStub,
-  reginaldId,
-  reginaldFile,
-  generatedComment
-) => {
-  test(assertionDescription, async () => {
-    var calledReginaldId: string | undefined
-    var calledBody: string | undefined
-
-    const commentFactory = makeCommentFactory()
-    const commentService: CommentService = {
-      createOrUpdateOrDeleteComment: async (reginaldCommentId, body) => {
-        calledReginaldId = reginaldCommentId
-        calledBody = body
-      }
-    }
-
-    // Just to satisfy the dependencies
-    const pr = prStub as Webhooks.WebhookPayloadPullRequestPullRequest
-
-    const runner = runnerFactory(
-      commentFactory,
-      commentService,
-      pr
-    )(reginaldId, reginaldFile)
-
-    await runner.run()
-
-    expect(calledReginaldId).toEqual(reginaldId)
-    expect(calledBody).toEqual(generatedComment)
-  })
-}
-
 const assert: (
   assertionDescription: string,
   args: {
