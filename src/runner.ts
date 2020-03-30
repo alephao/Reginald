@@ -42,7 +42,7 @@ export const runnerFactory = (
 
     const done = async (): Promise<void> => {
       const commentBody = commentFactory.makeComment(reginaldCommentId)
-      await commentService.createOrUpdateComment(reginaldCommentId, commentBody)
+      await commentService.createOrUpdateOrDeleteComment(reginaldCommentId, commentBody)
     }
 
     return makeRunner(dsl, reginaldfileContent, done)

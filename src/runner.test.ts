@@ -24,7 +24,7 @@ const assertFunc: (
 
     const commentFactory = makeCommentFactory()
     const commentService: CommentService = {
-      createOrUpdateComment: async (reginaldCommentId, body) => {
+      createOrUpdateOrDeleteComment: async (reginaldCommentId, body) => {
         calledReginaldId = reginaldCommentId
         calledBody = body
       }
@@ -64,7 +64,7 @@ const assert: (
 
     const commentFactory = makeCommentFactory()
     const commentService: CommentService = {
-      createOrUpdateComment: async (reginaldCommentId, body) => {
+      createOrUpdateOrDeleteComment: async (reginaldCommentId, body) => {
         calledReginaldId = reginaldCommentId
         calledBody = body
       }

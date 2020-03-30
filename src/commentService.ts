@@ -7,6 +7,7 @@ export interface CommentActions {
   ) => Promise<number | undefined>
   updateComment: (commentId: number, body: string) => Promise<void>
   createComment: (body: string) => Promise<void>
+  deleteComment: (commentId: number) => Promise<void>
 }
 
 export const makeCommentActions = (
@@ -56,38 +57,33 @@ export const makeCommentActions = (
       })
     }
 
-    const createOrUpdateComment = async (
-      reginaldCommentId: string,
-      body: string
-    ): Promise<void> => {
-      const previousCommentId = await findIdOfPreviousCommentWithReginaldId(
-        reginaldCommentId
-      )
-      if (previousCommentId) {
-        await updateComment(previousCommentId, body)
-      } else {
-        await createComment(body)
-      }
+    const deleteComment = async (commentId: number): Promise<void> => {
+      await github.issues.deleteComment({
+        // eslint-disable-next-line @typescript-eslint/camelcase
+        comment_id: commentId,
+        owner,
+        repo,
+      })
     }
 
     return {
       findIdOfPreviousCommentWithReginaldId,
       updateComment,
       createComment,
-      createOrUpdateComment
+      deleteComment
     }
   }
 }
 
 export interface CommentService {
-  createOrUpdateComment: (
+  createOrUpdateOrDeleteComment: (
     reginaldCommentId: string,
     body: string
   ) => Promise<void>
 }
 
 export const makeCommentService = (actions: CommentActions): CommentService => {
-  const createOrUpdateComment = async (
+  const createOrUpdateOrDeleteComment = async (
     reginaldCommentId: string,
     body: string
   ): Promise<void> => {
@@ -95,11 +91,15 @@ export const makeCommentService = (actions: CommentActions): CommentService => {
       reginaldCommentId
     )
     if (previousCommentId) {
-      await actions.updateComment(previousCommentId, body)
+      if (body === "") {
+        await actions.deleteComment(previousCommentId)
+      } else {
+        await actions.updateComment(previousCommentId, body)
+      }
     } else {
       await actions.createComment(body)
     }
   }
 
-  return {createOrUpdateComment}
+  return {createOrUpdateOrDeleteComment}
 }
