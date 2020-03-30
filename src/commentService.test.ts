@@ -1,88 +1,65 @@
 import {CommentActions, makeCommentService} from './commentService'
 
-test('Update comment when a comment is found', async () => {
-  var updateCommentCalled = false
-  var createCommentCalled = false
-  var deleteCommentCalled = false
-
-  const actionsMock: CommentActions = {
-    findIdOfPreviousCommentWithReginaldId: async _ => {
-      return 111 // random number
-    },
-    updateComment: async (_0, _1) => {
-      updateCommentCalled = true
-    },
-    createComment: async _ => {
-      createCommentCalled = true
-    },
-    deleteComment: async _ => {
-      deleteCommentCalled = true
+// Helper to test which request is made depending on the inputs
+const assert = (testDescription: string, 
+  args: {
+  commentExist: boolean,
+  newCommentBody: string,
+  expectUpdateCommentCalled?: boolean,
+  expectCreateCommentCalled?: boolean,
+  expectDeleteCommentCalled?: boolean
+}): void => {
+  test(testDescription, async () => {
+    var updateCommentCalled = false
+    var createCommentCalled = false
+    var deleteCommentCalled = false
+  
+    const actionsMock: CommentActions = {
+      findIdOfPreviousCommentWithReginaldId: async _ => {
+        return args.commentExist 
+          ? 111 // random number
+          : undefined
+      },
+      updateComment: async (_0, _1) => {
+        updateCommentCalled = true
+      },
+      createComment: async _ => {
+        createCommentCalled = true
+      },
+      deleteComment: async _ => {
+        deleteCommentCalled = true
+      }
     }
-  }
+  
+    const commentService = makeCommentService(actionsMock)
+  
+    await commentService.createOrUpdateOrDeleteComment('reginald', args.newCommentBody)
+  
+    expect(updateCommentCalled).toEqual(args.expectUpdateCommentCalled ?? false)
+    expect(createCommentCalled).toEqual(args.expectCreateCommentCalled ?? false)
+    expect(deleteCommentCalled).toEqual(args.expectDeleteCommentCalled ?? false)
+  })
+}
 
-  const commentService = makeCommentService(actionsMock)
-
-  await commentService.createOrUpdateOrDeleteComment('reginald', 'non-empty-body')
-
-  expect(updateCommentCalled).toBeTruthy()
-  expect(createCommentCalled).toBeFalsy()
-  expect(deleteCommentCalled).toBeFalsy()
+assert('Update comment when a comment is found', {
+  commentExist: true,
+  newCommentBody: 'non-empty-body',
+  expectUpdateCommentCalled: true
 })
 
-test('Create a comment when a comment is not found', async () => {
-  var updateCommentCalled = false
-  var createCommentCalled = false
-  var deleteCommentCalled = false
-
-  const actionsMock: CommentActions = {
-    findIdOfPreviousCommentWithReginaldId: async _ => {
-      return undefined
-    },
-    updateComment: async (_0, _1) => {
-      updateCommentCalled = true
-    },
-    createComment: async _ => {
-      createCommentCalled = true
-    },
-    deleteComment: async _ => {
-      deleteCommentCalled = true
-    }
-  }
-
-  const commentService = makeCommentService(actionsMock)
-
-  await commentService.createOrUpdateOrDeleteComment('', 'non-empty-body')
-
-  expect(updateCommentCalled).toBeFalsy()
-  expect(createCommentCalled).toBeTruthy()
-  expect(deleteCommentCalled).toBeFalsy()
+assert('Create a comment when a comment is not found', {
+  commentExist: false,
+  newCommentBody: 'non-empty-body',
+  expectCreateCommentCalled: true
 })
 
-test('Delete a comment when a comment is found and new comment is empty', async () => {
-  var updateCommentCalled = false
-  var createCommentCalled = false
-  var deleteCommentCalled = false
+assert('Delete a comment when a comment is found and new comment is empty', {
+  commentExist: true,
+  newCommentBody: '',
+  expectDeleteCommentCalled: true
+})
 
-  const actionsMock: CommentActions = {
-    findIdOfPreviousCommentWithReginaldId: async _ => {
-      return 123 // random number
-    },
-    updateComment: async (_0, _1) => {
-      updateCommentCalled = true
-    },
-    createComment: async _ => {
-      createCommentCalled = true
-    },
-    deleteComment: async _ => {
-      deleteCommentCalled = true
-    }
-  }
-
-  const commentService = makeCommentService(actionsMock)
-
-  await commentService.createOrUpdateOrDeleteComment('reginald', '')
-
-  expect(updateCommentCalled).toBeFalsy()
-  expect(createCommentCalled).toBeFalsy()
-  expect(deleteCommentCalled).toBeTruthy()
+assert('If a comment is not found and the new comment is empty, nothing happens', {
+  commentExist: false,
+  newCommentBody: ''
 })

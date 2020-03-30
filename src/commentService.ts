@@ -97,7 +97,9 @@ export const makeCommentService = (actions: CommentActions): CommentService => {
         await actions.updateComment(previousCommentId, body)
       }
     } else {
-      await actions.createComment(body)
+      if (body !== "") {
+        await actions.createComment(body)
+      }
     }
   }
 
