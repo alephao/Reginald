@@ -1,22 +1,24 @@
 import {CommentActions, makeCommentService} from './commentService'
 
 // Helper to test which request is made depending on the inputs
-const assert = (testDescription: string, 
+const assert = (
+  testDescription: string,
   args: {
-  commentExist: boolean,
-  newCommentBody: string,
-  expectUpdateCommentCalled?: boolean,
-  expectCreateCommentCalled?: boolean,
-  expectDeleteCommentCalled?: boolean
-}): void => {
+    commentExist: boolean
+    newCommentBody: string
+    expectUpdateCommentCalled?: boolean
+    expectCreateCommentCalled?: boolean
+    expectDeleteCommentCalled?: boolean
+  }
+): void => {
   test(testDescription, async () => {
     var updateCommentCalled = false
     var createCommentCalled = false
     var deleteCommentCalled = false
-  
+
     const actionsMock: CommentActions = {
       findIdOfPreviousCommentWithReginaldId: async _ => {
-        return args.commentExist 
+        return args.commentExist
           ? 111 // random number
           : undefined
       },
@@ -30,11 +32,14 @@ const assert = (testDescription: string,
         deleteCommentCalled = true
       }
     }
-  
+
     const commentService = makeCommentService(actionsMock)
-  
-    await commentService.createOrUpdateOrDeleteComment('reginald', args.newCommentBody)
-  
+
+    await commentService.createOrUpdateOrDeleteComment(
+      'reginald',
+      args.newCommentBody
+    )
+
     expect(updateCommentCalled).toEqual(args.expectUpdateCommentCalled ?? false)
     expect(createCommentCalled).toEqual(args.expectCreateCommentCalled ?? false)
     expect(deleteCommentCalled).toEqual(args.expectDeleteCommentCalled ?? false)
@@ -59,7 +64,10 @@ assert('Delete a comment when a comment is found and new comment is empty', {
   expectDeleteCommentCalled: true
 })
 
-assert('If a comment is not found and the new comment is empty, nothing happens', {
-  commentExist: false,
-  newCommentBody: ''
-})
+assert(
+  'If a comment is not found and the new comment is empty, nothing happens',
+  {
+    commentExist: false,
+    newCommentBody: ''
+  }
+)

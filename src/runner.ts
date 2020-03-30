@@ -1,5 +1,5 @@
 import {ReginaldDSL} from './ReginaldDSL'
-import {CommentFactory} from './commentFactory'
+import {CommentBuilder} from './CommentBuilder'
 import {CommentService} from './commentService'
 import * as Webhooks from '@octokit/webhooks'
 
@@ -25,7 +25,7 @@ const makeRunner = (
 }
 
 export const runnerFactory = (
-  commentFactory: CommentFactory,
+  commentBuilder: CommentBuilder,
   commentService: CommentService,
   pullRequest: Webhooks.WebhookPayloadPullRequestPullRequest
 ): ((
@@ -34,15 +34,18 @@ export const runnerFactory = (
 ) => ReginaldRunner) => {
   return (reginaldCommentId, reginaldfileContent) => {
     const dsl: ReginaldDSL = {
-      message: commentFactory.addMessage,
-      warning: commentFactory.addWarning,
-      error: commentFactory.addError,
+      message: (body: string) => commentBuilder.addMessage(body),
+      warning: (body: string) => commentBuilder.addWarning(body),
+      error: (body: string) => commentBuilder.addError(body),
       pr: pullRequest
     }
 
     const done = async (): Promise<void> => {
-      const commentBody = commentFactory.makeComment(reginaldCommentId)
-      await commentService.createOrUpdateOrDeleteComment(reginaldCommentId, commentBody)
+      const commentBody = commentBuilder.build(reginaldCommentId)
+      await commentService.createOrUpdateOrDeleteComment(
+        reginaldCommentId,
+        commentBody
+      )
     }
 
     return makeRunner(dsl, reginaldfileContent, done)

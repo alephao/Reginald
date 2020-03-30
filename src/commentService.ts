@@ -62,7 +62,7 @@ export const makeCommentActions = (
         // eslint-disable-next-line @typescript-eslint/camelcase
         comment_id: commentId,
         owner,
-        repo,
+        repo
       })
     }
 
@@ -91,13 +91,13 @@ export const makeCommentService = (actions: CommentActions): CommentService => {
       reginaldCommentId
     )
     if (previousCommentId) {
-      if (body === "") {
+      if (body === '') {
         await actions.deleteComment(previousCommentId)
       } else {
         await actions.updateComment(previousCommentId, body)
       }
     } else {
-      if (body !== "") {
+      if (body !== '') {
         await actions.createComment(body)
       }
     }

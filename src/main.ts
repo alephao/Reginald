@@ -4,7 +4,7 @@ import * as Webhooks from '@octokit/webhooks'
 
 import {getActionInputs} from './getActionInputs'
 import {runnerFactory} from './runner'
-import {makeCommentFactory} from './commentFactory'
+import {CommentBuilder} from './CommentBuilder'
 import {makeCommentService, makeCommentActions} from './commentService'
 
 async function run(): Promise<void> {
@@ -32,7 +32,7 @@ async function run(): Promise<void> {
     // Create GitHub client
     const octokit = new github.GitHub(actionInputs.token)
 
-    const commentFactory = makeCommentFactory()
+    const commentBuilder = new CommentBuilder()
     const commentActions = makeCommentActions(
       github.context.repo.owner,
       github.context.repo.repo,
@@ -47,7 +47,7 @@ async function run(): Promise<void> {
     )
 
     const runner = runnerFactory(
-      commentFactory,
+      commentBuilder,
       commentService,
       pullRequestPayload
     )(actionInputs.reginaldId, reginaldfileContent)

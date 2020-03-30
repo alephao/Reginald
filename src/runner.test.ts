@@ -1,7 +1,7 @@
 import * as Webhooks from '@octokit/webhooks'
 
 import {runnerFactory} from './runner'
-import {makeCommentFactory} from './commentFactory'
+import {CommentBuilder} from './CommentBuilder'
 import {CommentService} from './commentService'
 
 const assert: (
@@ -20,7 +20,7 @@ const assert: (
     var calledReginaldId: string | undefined
     var calledBody: string | undefined
 
-    const commentFactory = makeCommentFactory()
+    const commentBuilder = new CommentBuilder()
     const commentService: CommentService = {
       createOrUpdateOrDeleteComment: async (reginaldCommentId, body) => {
         calledReginaldId = reginaldCommentId
@@ -32,7 +32,7 @@ const assert: (
     const pr = args.prStub as Webhooks.WebhookPayloadPullRequestPullRequest
 
     const runner = runnerFactory(
-      commentFactory,
+      commentBuilder,
       commentService,
       pr
     )(args.reginaldId, reginaldfile)
