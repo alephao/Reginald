@@ -5,7 +5,7 @@ export interface CommentActions {
   findIdOfPreviousCommentWithReginaldId: (
     reginaldCommentId: string
   ) => Promise<number | undefined>
-  editComment: (commentId: number, body: string) => Promise<void>
+  updateComment: (commentId: number, body: string) => Promise<void>
   createComment: (body: string) => Promise<void>
 }
 
@@ -33,7 +33,7 @@ export const makeCommentActions = (
       return comment?.id
     }
 
-    const editComment = async (
+    const updateComment = async (
       commentId: number,
       body: string
     ): Promise<void> => {
@@ -64,7 +64,7 @@ export const makeCommentActions = (
         reginaldCommentId
       )
       if (previousCommentId) {
-        await editComment(previousCommentId, body)
+        await updateComment(previousCommentId, body)
       } else {
         await createComment(body)
       }
@@ -72,7 +72,7 @@ export const makeCommentActions = (
 
     return {
       findIdOfPreviousCommentWithReginaldId,
-      editComment,
+      updateComment,
       createComment,
       createOrUpdateComment
     }
@@ -95,7 +95,7 @@ export const makeCommentService = (actions: CommentActions): CommentService => {
       reginaldCommentId
     )
     if (previousCommentId) {
-      await actions.editComment(previousCommentId, body)
+      await actions.updateComment(previousCommentId, body)
     } else {
       await actions.createComment(body)
     }

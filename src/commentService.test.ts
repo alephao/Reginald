@@ -1,15 +1,15 @@
 import {CommentActions, makeCommentService} from './commentService'
 
-test('Edit comment when a comment is found', async () => {
-  var editCommentCalled = false
+test('Update comment when a comment is found', async () => {
+  var updateCommentCalled = false
   var createCommentCalled = false
 
   const actionsMock: CommentActions = {
     findIdOfPreviousCommentWithReginaldId: async _ => {
       return 111
     },
-    editComment: async (_0, _1) => {
-      editCommentCalled = true
+    updateComment: async (_0, _1) => {
+      updateCommentCalled = true
     },
     createComment: async _ => {
       createCommentCalled = true
@@ -20,20 +20,20 @@ test('Edit comment when a comment is found', async () => {
 
   await commentService.createOrUpdateComment('', '')
 
-  expect(editCommentCalled).toBeTruthy()
+  expect(updateCommentCalled).toBeTruthy()
   expect(createCommentCalled).toBeFalsy()
 })
 
 test('Create a comment when a comment is not found', async () => {
-  var editCommentCalled = false
+  var updateCommentCalled = false
   var createCommentCalled = false
 
   const actionsMock: CommentActions = {
     findIdOfPreviousCommentWithReginaldId: async _ => {
       return undefined
     },
-    editComment: async (_0, _1) => {
-      editCommentCalled = true
+    updateComment: async (_0, _1) => {
+      updateCommentCalled = true
     },
     createComment: async _ => {
       createCommentCalled = true
@@ -44,6 +44,6 @@ test('Create a comment when a comment is not found', async () => {
 
   await commentService.createOrUpdateComment('', '')
 
-  expect(editCommentCalled).toBeFalsy()
+  expect(updateCommentCalled).toBeFalsy()
   expect(createCommentCalled).toBeTruthy()
 })
