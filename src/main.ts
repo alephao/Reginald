@@ -4,8 +4,9 @@ import * as Webhooks from '@octokit/webhooks'
 
 import {getActionInputs} from './getActionInputs'
 import {runnerFactory} from './runner'
-import {CommentBuilder} from './CommentBuilder'
-import {makeCommentService, makeCommentActions} from './commentService'
+import {CommentBuilder} from './commenting/CommentBuilder'
+import {makeCommentService, makeCommentActions} from './services/commentService'
+import {PullRequestService} from './services/PullRequestService'
 
 async function run(): Promise<void> {
   try {
@@ -32,6 +33,8 @@ async function run(): Promise<void> {
     // Create GitHub client
     const octokit = new github.GitHub(actionInputs.token)
 
+    // octokit.pulls.listFiles
+
     const commentBuilder = new CommentBuilder()
     const commentActions = makeCommentActions(
       github.context.repo.owner,
@@ -46,11 +49,21 @@ async function run(): Promise<void> {
       actionInputs.reginaldfilePath
     )
 
+    const pullRequestService = new PullRequestService(
+      octokit,
+      github.context.repo.owner,
+      github.context.repo.repo,
+      issueNumber
+    )
+
+    const gitDSL = await pullRequestService.gitDSL()
+
     const runner = runnerFactory(
       commentBuilder,
       commentService,
-      () =>  core.setFailed('Reginald left a comment on the pull request'),
-      pullRequestPayload
+      () => core.setFailed('Reginald left a comment on the pull request'),
+      pullRequestPayload,
+      gitDSL
     )(actionInputs.reginaldId, reginaldfileContent)
 
     await runner.run()

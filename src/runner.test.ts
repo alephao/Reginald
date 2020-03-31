@@ -1,13 +1,15 @@
 import * as Webhooks from '@octokit/webhooks'
 
 import {runnerFactory} from './runner'
-import {CommentBuilder} from './CommentBuilder'
-import {CommentService} from './commentService'
+import {CommentBuilder} from './commenting/CommentBuilder'
+import {CommentService} from './services/commentService'
+import {GitDSL} from './dsl/GitDSL'
 
 const assert: (
   assertionDescription: string,
   args: {
     prStub: any // The pull request webhook data stub
+    gitStub: any
     reginaldId: string
     reginaldfile: string
     generatedComment: string
@@ -20,7 +22,7 @@ const assert: (
   test(assertionDescription, async () => {
     var calledReginaldId: string | undefined
     var calledBody: string | undefined
-    
+
     var calledSetFailed: boolean = false
 
     const commentBuilder = new CommentBuilder()
@@ -33,12 +35,16 @@ const assert: (
 
     // Just to satisfy the dependencies
     const pr = args.prStub as Webhooks.WebhookPayloadPullRequestPullRequest
+    const git = args.gitStub as GitDSL
 
     const runner = runnerFactory(
       commentBuilder,
       commentService,
-      () => { calledSetFailed = true },
-      pr
+      () => {
+        calledSetFailed = true
+      },
+      pr,
+      git
     )(args.reginaldId, reginaldfile)
 
     await runner.run()
@@ -51,6 +57,7 @@ const assert: (
 
 assert('createOrUpdateComment is called with the right arguments', {
   prStub: {},
+  gitStub: {},
   reginaldId: '123',
   reginaldfile: `
 reginald.message('A');
@@ -72,11 +79,12 @@ reginald.error('E');
 **Errors**
 :no_entry_sign: E
 `,
-prShouldFail: true
+  prShouldFail: true
 })
 
 assert('Send an error when the pull request title is wrong', {
   prStub: {title: 'Hello'},
+  gitStub: {},
   reginaldId: '321',
   reginaldfile: `
 if (reginald.pr.title === 'Hello World') {
@@ -90,11 +98,12 @@ if (reginald.pr.title === 'Hello World') {
 **Errors**
 :no_entry_sign: The title is wrong!
 `,
-prShouldFail: true
+  prShouldFail: true
 })
 
 assert('Send a message when pull request title is right', {
   prStub: {title: 'Hello World'},
+  gitStub: {},
   reginaldId: 'reginald',
   reginaldfile: `
 if (reginald.pr.title === 'Hello World') {
@@ -108,5 +117,24 @@ if (reginald.pr.title === 'Hello World') {
 **Messages**
 :speech_balloon: The title is correct!
 `,
-prShouldFail: false
+  prShouldFail: false
+})
+
+assert('Send a message when git file is changed', {
+  prStub: {},
+  gitStub: {modifiedFiles: ['file.txt']},
+  reginaldId: 'reginald',
+  reginaldfile: `
+if (reginald.git.modifiedFiles.includes('file.txt')) {
+  reginald.warning('file.txt was modified');
+} else {
+  reginald.message('All good!');
+}
+`.trim(),
+  generatedComment: `
+<!--reginald-id: reginald-->
+**Warnings**
+:warning: file.txt was modified
+`,
+  prShouldFail: false
 })

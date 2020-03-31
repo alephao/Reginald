@@ -1,5 +1,5 @@
 import {GitHub} from '@actions/github'
-import {formatCommentId} from './commentFormatter'
+import {formatCommentId} from '../commenting/commentFormatter'
 
 export interface CommentActions {
   findIdOfPreviousCommentWithReginaldId: (

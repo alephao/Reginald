@@ -1,4 +1,4 @@
-import {FormatStringFunction} from './FormatStringFunction'
+import {FormatStringFunction} from '../FormatStringFunction'
 
 export class CommentSectionFormatter {
   header: string

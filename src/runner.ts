@@ -1,6 +1,7 @@
-import {ReginaldDSL} from './ReginaldDSL'
-import {CommentBuilder} from './CommentBuilder'
-import {CommentService} from './commentService'
+import {ReginaldDSL} from './dsl/ReginaldDSL'
+import {CommentBuilder} from './commenting/CommentBuilder'
+import {CommentService} from './services/commentService'
+import {GitDSL} from './dsl/GitDSL'
 import * as Webhooks from '@octokit/webhooks'
 
 const AsyncFunction = Object.getPrototypeOf(async function() {}).constructor
@@ -28,7 +29,8 @@ export const runnerFactory = (
   commentBuilder: CommentBuilder,
   commentService: CommentService,
   setFailed: () => void, // Function that sets the pr to failed
-  pullRequest: Webhooks.WebhookPayloadPullRequestPullRequest
+  pullRequest: Webhooks.WebhookPayloadPullRequestPullRequest,
+  gitDSL: GitDSL
 ): ((
   reginaldCommentId: string,
   reginaldfileContent: string
@@ -38,7 +40,8 @@ export const runnerFactory = (
       message: (body: string) => commentBuilder.addMessage(body),
       warning: (body: string) => commentBuilder.addWarning(body),
       error: (body: string) => commentBuilder.addError(body),
-      pr: pullRequest
+      pr: pullRequest,
+      git: gitDSL
     }
 
     const done = async (): Promise<void> => {
@@ -47,7 +50,9 @@ export const runnerFactory = (
         reginaldCommentId,
         commentBody
       )
-      if (commentBuilder.errors.length > 0) { setFailed(); }
+      if (commentBuilder.errors.length > 0) {
+        setFailed()
+      }
     }
 
     return makeRunner(dsl, reginaldfileContent, done)
