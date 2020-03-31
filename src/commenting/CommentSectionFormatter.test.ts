@@ -2,7 +2,7 @@ import {
   messageSectionFormatter,
   warningSectionFormatter,
   errorSectionFormatter
-} from './CommentSectionFormatter'
+} from '.'
 
 test('messageSectionFormatter with empty array', () => {
   expect(messageSectionFormatter.format([])).toEqual('')

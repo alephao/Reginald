@@ -1,16 +1,18 @@
-import {formatCommentId, commentFormatter} from './commentFormatter'
+import {CommentFormatter} from '.'
 
 test('commentIdFormatter', () => {
-  expect(formatCommentId('123')).toEqual('<!--reginald-id: 123-->')
+  expect(CommentFormatter.formatCommentId('123')).toEqual(
+    '<!--reginald-id: 123-->'
+  )
 })
 
 test('commentFormatter empty', () => {
-  const result = commentFormatter('123')([], [], [])
+  const result = CommentFormatter.formatComment('123', [], [], [])
   expect(result).toEqual('')
 })
 
 test('commentFormatter only with messages', () => {
-  const result = commentFormatter('123')(['A', 'B'], [], [])
+  const result = CommentFormatter.formatComment('123', ['A', 'B'], [], [])
   expect(result).toEqual(
     `
 <!--reginald-id: 123-->
@@ -22,7 +24,7 @@ test('commentFormatter only with messages', () => {
 })
 
 test('commentFormatter with messages, warnings and errors', () => {
-  const result = commentFormatter('123')(['A', 'B'], ['C'], ['D'])
+  const result = CommentFormatter.formatComment('123', ['A', 'B'], ['C'], ['D'])
   expect(result).toEqual(
     `
 <!--reginald-id: 123-->

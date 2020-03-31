@@ -1,4 +1,4 @@
-import {CommentBuilder} from './CommentBuilder'
+import {CommentBuilder} from '.'
 
 test('Test comment built', () => {
   const commentBuilder = new CommentBuilder()

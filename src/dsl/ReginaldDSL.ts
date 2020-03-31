@@ -1,5 +1,5 @@
 import * as Webhooks from '@octokit/webhooks'
-import { GitDSL } from './GitDSL'
+import {GitDSL} from '.'
 
 export interface ReginaldDSL {
   message: (body: string) => void

@@ -2,16 +2,19 @@ import {
   messageSectionFormatter,
   warningSectionFormatter,
   errorSectionFormatter
-} from './CommentSectionFormatter'
+} from '.'
 
-export const formatCommentId = (id: string): string => {
-  return `<!--reginald-id: ${id}-->`
-}
+export class CommentFormatter {
+  static formatCommentId(id: string): string {
+    return `<!--reginald-id: ${id}-->`
+  }
 
-export const commentFormatter = (
-  id: string
-): ((messages: string[], warnings: string[], errors: string[]) => string) => {
-  return (messages: string[], warnings: string[], errors: string[]) => {
+  static formatComment(
+    reginaldId: string,
+    messages: string[],
+    warnings: string[],
+    errors: string[]
+  ): string {
     const formattedComments = []
 
     const messageSection = messageSectionFormatter.format(messages)
@@ -33,7 +36,7 @@ export const commentFormatter = (
       return ''
     }
 
-    const bodyId = formatCommentId(id)
+    const bodyId = CommentFormatter.formatCommentId(reginaldId)
     const bodyContent = formattedComments.join('\n\n')
 
     return [bodyId, bodyContent].join('\n')

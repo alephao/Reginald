@@ -1,7 +1,7 @@
-import {ReginaldDSL} from './dsl/ReginaldDSL'
-import {CommentBuilder} from './commenting/CommentBuilder'
-import {CommentService} from './services/commentService'
-import {GitDSL} from './dsl/GitDSL'
+import {ReginaldDSL} from './dsl'
+import {CommentBuilder} from './commenting'
+import {ICommentService} from './services'
+import {GitDSL} from './dsl'
 import * as Webhooks from '@octokit/webhooks'
 
 const AsyncFunction = Object.getPrototypeOf(async function() {}).constructor
@@ -27,7 +27,7 @@ const makeRunner = (
 
 export const runnerFactory = (
   commentBuilder: CommentBuilder,
-  commentService: CommentService,
+  commentService: ICommentService,
   setFailed: () => void, // Function that sets the pr to failed
   pullRequest: Webhooks.WebhookPayloadPullRequestPullRequest,
   gitDSL: GitDSL

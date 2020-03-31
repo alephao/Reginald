@@ -1,4 +1,4 @@
-import {CommentActions, makeCommentService} from './commentService'
+import {CommentService, ICommentActions} from '.'
 
 // Helper to test which request is made depending on the inputs
 const assert = (
@@ -16,7 +16,7 @@ const assert = (
     var createCommentCalled = false
     var deleteCommentCalled = false
 
-    const actionsMock: CommentActions = {
+    const actionsMock: ICommentActions = {
       findIdOfPreviousCommentWithReginaldId: async _ => {
         return args.commentExist
           ? 111 // random number
@@ -33,7 +33,7 @@ const assert = (
       }
     }
 
-    const commentService = makeCommentService(actionsMock)
+    const commentService = new CommentService(actionsMock)
 
     await commentService.createOrUpdateOrDeleteComment(
       'reginald',

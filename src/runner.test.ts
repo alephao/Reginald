@@ -1,9 +1,9 @@
 import * as Webhooks from '@octokit/webhooks'
 
 import {runnerFactory} from './runner'
-import {CommentBuilder} from './commenting/CommentBuilder'
-import {CommentService} from './services/commentService'
-import {GitDSL} from './dsl/GitDSL'
+import {CommentBuilder} from './commenting'
+import {ICommentService} from './services'
+import {GitDSL} from './dsl'
 
 const assert: (
   assertionDescription: string,
@@ -26,7 +26,7 @@ const assert: (
     var calledSetFailed: boolean = false
 
     const commentBuilder = new CommentBuilder()
-    const commentService: CommentService = {
+    const commentService: ICommentService = {
       createOrUpdateOrDeleteComment: async (reginaldCommentId, body) => {
         calledReginaldId = reginaldCommentId
         calledBody = body

@@ -2,11 +2,15 @@ import * as core from '@actions/core'
 import * as github from '@actions/github'
 import * as Webhooks from '@octokit/webhooks'
 
-import {getActionInputs} from './getActionInputs'
+import {getActionInputs} from './helpers'
 import {runnerFactory} from './runner'
-import {CommentBuilder} from './commenting/CommentBuilder'
-import {makeCommentService, makeCommentActions} from './services/commentService'
-import {PullRequestService} from './services/PullRequestService'
+import {CommentBuilder} from './commenting'
+import {
+  CommentService,
+  CommentActions,
+  PullRequestService,
+  RepoService
+} from './services'
 
 async function run(): Promise<void> {
   try {
@@ -33,19 +37,23 @@ async function run(): Promise<void> {
     // Create GitHub client
     const octokit = new github.GitHub(actionInputs.token)
 
-    // octokit.pulls.listFiles
-
     const commentBuilder = new CommentBuilder()
-    const commentActions = makeCommentActions(
+    const commentActions = new CommentActions(
       github.context.repo.owner,
       github.context.repo.repo,
-      issueNumber
-    )(octokit)
-    const commentService = makeCommentService(commentActions)
+      issueNumber,
+      octokit
+    )
+    const commentService = new CommentService(commentActions)
 
     // Content
-    const reginaldfileContent = await fetchContent(
+    const repoService = new RepoService(
       octokit,
+      github.context.repo.owner,
+      github.context.repo.repo
+    )
+    const reginaldfileContent = await repoService.getContentsOfFile(
+      github.context.sha,
       actionInputs.reginaldfilePath
     )
 
@@ -70,35 +78,6 @@ async function run(): Promise<void> {
   } catch (error) {
     core.setFailed(error.message)
   }
-}
-
-async function fetchContent(
-  octokit: github.GitHub,
-  path: string
-): Promise<string> {
-  const response = await octokit.repos.getContents({
-    owner: github.context.repo.owner,
-    repo: github.context.repo.repo,
-    path,
-    ref: github.context.sha
-  })
-
-  // Workaround https://github.com/octokit/rest.js/issues/1516
-  if (Array.isArray(response.data)) {
-    throw new Error(
-      'Failed to get content from Reginaldfile: octokit.repos.getContents returned an array'
-    )
-  }
-
-  const content = response.data.content
-  const encoding = response.data.encoding as BufferEncoding
-
-  if (content && encoding) {
-    const contentString = Buffer.from(content, encoding).toString()
-    return contentString
-  }
-
-  throw new Error('Failed to get content from Reginaldfile')
 }
 
 run()

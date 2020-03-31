@@ -1,5 +1,5 @@
 import {GitHub} from '@actions/github'
-import { GitDSL } from '../dsl/GitDSL'
+import {GitDSL} from '../dsl'
 
 export interface IPullRequestService {
   gitDSL(): Promise<GitDSL>
@@ -20,7 +20,7 @@ export class PullRequestService implements IPullRequestService {
 
   async gitDSL(): Promise<GitDSL> {
     const self = this
-    const { data: response } = await this.github.pulls.listFiles({
+    const {data: response} = await self.github.pulls.listFiles({
       owner: self.owner,
       pull_number: self.prNumber,
       repo: self.repo
@@ -44,5 +44,4 @@ export class PullRequestService implements IPullRequestService {
       modifiedFiles
     }
   }
-
 }

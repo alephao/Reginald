@@ -1,4 +1,4 @@
-import {commentFormatter} from './commentFormatter'
+import {CommentFormatter} from '.'
 
 export class CommentBuilder {
   messages: Array<string> = []
@@ -16,7 +16,8 @@ export class CommentBuilder {
   }
 
   build(reginaldId: string): string {
-    return commentFormatter(reginaldId)(
+    return CommentFormatter.formatComment(
+      reginaldId,
       this.messages,
       this.warnings,
       this.errors
