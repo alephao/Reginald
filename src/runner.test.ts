@@ -3,7 +3,7 @@ import * as Webhooks from '@octokit/webhooks'
 import {runnerFactory} from './runner'
 import {CommentBuilder} from './commenting'
 import {ICommentService} from './services'
-import {GitDSL} from './dsl'
+import {GitDSL, PullRequestDSL} from './dsl'
 
 const assert: (
   assertionDescription: string,
@@ -34,7 +34,7 @@ const assert: (
     }
 
     // Just to satisfy the dependencies
-    const pr = args.prStub as Webhooks.WebhookPayloadPullRequestPullRequest
+    const pr = args.prStub as PullRequestDSL
     const git = args.gitStub as GitDSL
 
     const runner = runnerFactory(

@@ -65,12 +65,13 @@ async function run(): Promise<void> {
     )
 
     const gitDSL = await pullRequestService.gitDSL()
+    const pullRequestDSL = await pullRequestService.pullRequestDSL()
 
     const runner = runnerFactory(
       commentBuilder,
       commentService,
       () => core.setFailed('Reginald left a comment on the pull request'),
-      pullRequestPayload,
+      pullRequestDSL,
       gitDSL
     )(actionInputs.reginaldId, reginaldfileContent)
 
