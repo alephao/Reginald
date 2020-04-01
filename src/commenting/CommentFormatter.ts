@@ -4,12 +4,12 @@ import {
   errorSectionFormatter
 } from '.'
 
-export class CommentFormatter {
-  static formatCommentId(id: string): string {
+export const CommentFormatter = {
+  formatCommentId(id: string): string {
     return `<!--reginald-id: ${id}-->`
-  }
+  },
 
-  static formatComment(
+  formatComment(
     reginaldId: string,
     messages: string[],
     warnings: string[],

@@ -12,23 +12,23 @@ const assert = (
   }
 ): void => {
   test(testDescription, async () => {
-    var updateCommentCalled = false
-    var createCommentCalled = false
-    var deleteCommentCalled = false
+    let updateCommentCalled = false
+    let createCommentCalled = false
+    let deleteCommentCalled = false
 
     const actionsMock: ICommentActions = {
-      findIdOfPreviousCommentWithReginaldId: async _ => {
+      findIdOfPreviousCommentWithReginaldId: async () => {
         return args.commentExist
           ? 111 // random number
           : undefined
       },
-      updateComment: async (_0, _1) => {
+      updateComment: async () => {
         updateCommentCalled = true
       },
-      createComment: async _ => {
+      createComment: async () => {
         createCommentCalled = true
       },
-      deleteComment: async _ => {
+      deleteComment: async () => {
         deleteCommentCalled = true
       }
     }

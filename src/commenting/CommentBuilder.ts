@@ -1,9 +1,9 @@
 import {CommentFormatter} from '.'
 
 export class CommentBuilder {
-  messages: Array<string> = []
-  warnings: Array<string> = []
-  errors: Array<string> = []
+  messages: string[] = []
+  warnings: string[] = []
+  errors: string[] = []
 
   addMessage(body: string): void {
     this.messages.push(body)

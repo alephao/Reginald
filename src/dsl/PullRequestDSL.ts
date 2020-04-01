@@ -7,4 +7,5 @@ type PullsGetResponse = Unwrap<
   ReturnType<InstanceType<typeof GitHub>['pulls']['get']>
 >['data']
 
+// eslint-disable-next-line @typescript-eslint/no-empty-interface
 export interface PullRequestDSL extends PullsGetResponse {}

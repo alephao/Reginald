@@ -22,6 +22,7 @@ export class PullRequestService implements IPullRequestService {
     const self = this
     const {data: response} = await self.github.pulls.listFiles({
       owner: self.owner,
+      // eslint-disable-next-line @typescript-eslint/camelcase
       pull_number: self.prNumber,
       repo: self.repo
     })
@@ -50,6 +51,7 @@ export class PullRequestService implements IPullRequestService {
     const {data: response} = await self.github.pulls.get({
       owner: self.owner,
       repo: self.repo,
+      // eslint-disable-next-line @typescript-eslint/camelcase
       pull_number: self.prNumber
     })
 

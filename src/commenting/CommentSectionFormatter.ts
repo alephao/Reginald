@@ -9,16 +9,17 @@ export class CommentSectionFormatter {
     this.formatItemFunction = formatItemFunction
   }
 
-  format: (items: string[]) => string = items => {
+  format(items: string[]): string {
+    const self = this
     if (items.length < 1) {
       return ''
     }
 
     const formattedItems = items
-      .map((item, _0, _1) => this.formatItemFunction(item))
+      .map(item => self.formatItemFunction(item))
       .join('\n')
 
-    return [this.header, formattedItems].join('\n')
+    return [self.header, formattedItems].join('\n')
   }
 }
 
