@@ -30,7 +30,7 @@ reginald.git.modifiedFiles: string[] // List of modified files
 
 In this example we'll set up reginald to fail pull-requests with titles that doesn't start with the pattern `[JIRA-123]`.
 
-By default, Reginald will look for a `Reginald.js` file inside the `.github` folder, so let's create the file and add the following contents:
+By default, Reginald will look for a `Reginaldfile.js` file inside the `.github` folder, so let's create the file and add the following contents:
 
 ```js
 if (!/\[[A-Z]+-[0-9]+\]\s/.test(reginald.pr.title)) {
