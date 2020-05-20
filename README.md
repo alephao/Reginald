@@ -66,6 +66,10 @@ That's it for a minimal setup, now if someone creates a pull-request that doesn'
 
 ![Error Message](assets/reginald-error-jira.png)
 
+### Documentation
+
+See the [Documentation](Documentation) folder:
+
 ### License
 
 [MIT License](LICENSE)
