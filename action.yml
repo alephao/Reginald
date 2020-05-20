@@ -1,5 +1,9 @@
-name: 'Reginald'
-description: 'Reginald'
+name: Reginald - A pull-request review bot
+author: Aleph Retamal
+description: Automate your pull-request review
+branding:
+  icon: check-circle
+  color: green
 inputs:
   repo-token:
     description: 'The GITHUB_TOKEN secret'
